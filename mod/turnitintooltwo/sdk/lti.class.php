@@ -37,6 +37,7 @@ class LTI extends OAuthSimple {
     private $sslcertificate;
 
     private $istestingconnection;
+    private $perflog;
 
     public function __construct( $apibaseurl ) {
         $this->setApiBaseUrl( $apibaseurl );
@@ -45,6 +46,7 @@ class LTI extends OAuthSimple {
             'resource_link_id' => $this->genUuid()
         );
         $this->istestingconnection = false;
+        $this->perflog = null;
     }
 
     /**
@@ -820,6 +822,14 @@ class LTI extends OAuthSimple {
         $this->istestingconnection = $istestingconnection;
     }
 
+    public function getPerflog() {
+        return $this->perflog;
+    }
+
+    public function setPerflog($perflog) {
+        $this->perflog = $perflog;
+    }
+
     /**
      *
      * @param array $params
@@ -851,12 +861,15 @@ class LTI extends OAuthSimple {
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, sprintf('%s:%s', $this->proxyuser, $this->proxypassword));
         }
 
-        $start_time = microtime(true);
+        if ($this->perflog !== null) {
+            $this->perflog->start_timer();
+        }
 
         $result = curl_exec($ch);
 
-        $total_response_time = (microtime(true) - $start_time);
-        turnitintooltwo_perflog($ch, $total_response_time);
+        if ($this->perflog !== null) {
+            $this->perflog->stop_timer($ch);
+        }
 
         if( $result === false) {
             $err = 'Curl error: ' . curl_error($ch);

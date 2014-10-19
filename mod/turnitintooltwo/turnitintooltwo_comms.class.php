@@ -20,6 +20,7 @@
  */
 
 require_once($CFG->dirroot.'/mod/turnitintooltwo/sdk/api.class.php');
+require_once($CFG->dirroot.'/mod/turnitintooltwo/turnitintooltwo_perflog.class.php');
 
 class turnitintooltwo_comms {
 
@@ -92,6 +93,7 @@ class turnitintooltwo_comms {
         }
 
         $api->setIsTestingConnection($istestingconnection);
+        $api->setPerflog(new turnitintooltwo_perflog());
 
         return $api;
     }

@@ -29,6 +29,7 @@ class Soap extends SoapClient {
     private $sslcertificate;
 
     private $istestingconnection;
+    private $perflog;
 
     protected $extensions;
 
@@ -149,6 +150,14 @@ class Soap extends SoapClient {
         $this->istestingconnection = $istestingconnection;
     }
 
+    public function getPerflog() {
+        return $this->perflog;
+    }
+
+    public function setPerflog($perflog) {
+        $this->perflog = $perflog;
+    }
+
     public function genUuid() {
         return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             mt_rand( 0, 0xffff ),
@@ -244,6 +253,7 @@ class Soap extends SoapClient {
                         'AcceptNothingSubmission' => 'Boolean'
                         );
         $this->istestingconnection = false;
+        $this->perflog = null;
         parent::__construct( $wsdl, $options );
     }
 
@@ -293,12 +303,15 @@ class Soap extends SoapClient {
 
         $this->setHttpHeaders( join( PHP_EOL, $curl_headers ) );
 
-        $start_time = microtime(true);
+        if ($this->perflog !== null) {
+            $this->perflog->start_timer();
+        }
 
         $result = curl_exec($ch);
 
-        $total_response_time = (microtime(true) - $start_time);
-        turnitintooltwo_perflog($ch, $total_response_time);
+        if ($this->perflog !== null) {
+            $this->perflog->stop_timer($ch);
+        }
 
         if( $result === false) {
             $logger = new Logger( $this->logpath );

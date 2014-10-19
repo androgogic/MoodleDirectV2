@@ -31,6 +31,7 @@ class TurnitinAPI {
     private $sslcertificate;
 
     private $istestingconnection;
+    private $perflog;
 
     private $personwsdl;
     private $coursesectionwsdl;
@@ -68,6 +69,7 @@ class TurnitinAPI {
         $this->language   = $language;
 
         $this->istestingconnection = false;
+        $this->perflog = null;
 
         $this->personwsdl = dirname(__FILE__).'/wsdl/lis-person.wsdl';
         $this->coursesectionwsdl = dirname(__FILE__).'/wsdl/lis-coursesection.wsdl';
@@ -221,6 +223,24 @@ class TurnitinAPI {
     }
 
     /**
+     * Get logger for performance data
+     *
+     * @return PerfLog
+     */
+    public function getPerflog() {
+        return $this->perflog;
+    }
+
+    /**
+     * Set logger for performance data
+     *
+     * @param PerfLog $perflog
+     */
+    public function setPerflog($perflog) {
+        $this->perflog = $perflog;
+    }
+
+    /**
      * Get SDK Version
      *
      * Get the current release version of the SDK
@@ -313,6 +333,7 @@ class TurnitinAPI {
             $service->setSSLCertificate( $this->sslcertificate );
         }
         $service->setIsTestingConnection($this->istestingconnection);
+        $service->setPerflog($this->perflog);
         return $service;
     }
 
